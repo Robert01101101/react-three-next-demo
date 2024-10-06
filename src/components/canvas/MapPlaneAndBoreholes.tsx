@@ -12,7 +12,7 @@ import { BoreholeCylinder } from './BoreholeCylinder';
 const boreholeCsvUrl = '/DIG_2014_0012/Intervals.csv';
 
 
-export function MapPlane(props) {
+export function MapPlaneAndBoreholes(props) {
   //map texture
   const [texture, setTexture] = useState<THREE.Texture | null>(null); // Specify the type for texture state
   const materialRef = useRef<THREE.MeshBasicMaterial>(null); // Create a ref for the material

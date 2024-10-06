@@ -2,12 +2,14 @@
 
 import dynamic from 'next/dynamic'
 import { Suspense } from 'react'
+import '../styles/tooltip.css';
+
 
 const Logo = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Logo), { ssr: false })
 const Dog = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Dog), { ssr: false })
 const Duck = dynamic(() => import('@/components/canvas/Examples').then((mod) => mod.Duck), { ssr: false })
 //new from me
-const MapPlane = dynamic(() => import('@/components/canvas/Demo').then((mod) => mod.MapPlane), { ssr: false })
+const MapPlaneAndBoreholes = dynamic(() => import('@/components/canvas/MapPlaneAndBoreholes').then((mod) => mod.MapPlaneAndBoreholes), { ssr: false })
 const MapImage = dynamic(() => import('@/components/canvas/DemoImage').then((mod) => mod.MapImage), { ssr: false })
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
@@ -30,14 +32,17 @@ const Common = dynamic(() => import('@/components/canvas/View').then((mod) => mo
 export default function Page() {
   return (
     <>
-      <div className="h-screen w-screen">
-        {/*<MapImage />*/}
+      <div className="relative h-screen w-screen">
+        {/* The Three.js view */}
         <View orbit className='size-full'>
-            <Suspense fallback={null}>
-              <MapPlane />
-              <Common />
-            </Suspense>
-          </View>
+          <Suspense fallback={null}>
+            <MapPlaneAndBoreholes />
+            <Common />
+          </Suspense>
+        </View>
+
+        {/* Tooltip for displaying depth, color, etc */}
+        <div id="tooltip" className="pointer-events-none absolute hidden rounded bg-gray-700 px-2 py-1 text-white opacity-90" />
       </div>
 
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
