@@ -7,6 +7,8 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
   const cylinderGroupRef = useRef(new THREE.Group());
   const raycasterRef = useRef(new THREE.Raycaster());
   const { camera, mouse, scene } = useThree();
+  const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
+  let currentOutline = null; // Variable to store the current outline
 
   useEffect(() => {
     const tooltip = document.getElementById('tooltip');
@@ -39,7 +41,39 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
       }
     };
 
+    const onMouseClick = () => {
+      // Update raycaster to find clicked objects
+      raycasterRef.current.setFromCamera(mouse, camera);
+      const intersects = raycasterRef.current.intersectObjects(cylinderGroupRef.current.children);
+
+      if (intersects.length > 0) {
+        const selectedSegment = intersects[0].object;
+
+        // Remove the current outline if it exists
+        if (currentOutline) {
+          scene.remove(currentOutline);
+        }
+
+        // Create edges geometry for the selected borehole segment
+        const edges = new THREE.EdgesGeometry(selectedSegment.geometry);
+        currentOutline = new THREE.LineSegments(edges, outlineMaterial);
+        
+        // Set the position to match the original segment
+        currentOutline.position.copy(selectedSegment.position);
+        
+        // Add the outline to the scene
+        scene.add(currentOutline);
+      } else {
+        // If nothing is selected, remove the outline
+        if (currentOutline) {
+          scene.remove(currentOutline);
+          currentOutline = null; // Reset current outline
+        }
+      }
+    };
+
     window.addEventListener('mousemove', onMouseMove);
+    window.addEventListener('click', onMouseClick); // Add click event listener
 
     const animate = () => {
       checkForHover();
@@ -50,6 +84,7 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
 
     return () => {
       window.removeEventListener('mousemove', onMouseMove);
+      window.removeEventListener('click', onMouseClick); // Clean up click event listener
     };
   }, [camera, mouse]);
 
