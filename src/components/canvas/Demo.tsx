@@ -10,18 +10,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useBoreholeData } from 'src/helpers/BoreholeLoader';
 import { BoreholeCylinder } from './BoreholeCylinder';
 const boreholeCsvUrl = '/DIG_2014_0012/Intervals.csv';
-import BoreholeTooltip from './BoreholeTooltip';
 
 
 export function MapPlane(props) {
   //map texture
   const [texture, setTexture] = useState<THREE.Texture | null>(null); // Specify the type for texture state
   const materialRef = useRef<THREE.MeshBasicMaterial>(null); // Create a ref for the material
-
-  //Borehole Tooltip
-  const [tooltipContent, setTooltipContent] = useState<string>('');
-  const [tooltipPosition, setTooltipPosition] = useState<{ x: number; y: number }>({ x: 0, y: 0 });
-  const [showTooltip, setShowTooltip] = useState(false);
 
   // Calculate tile coordinates for Britannia Mine Museum
   const latitude = 49.62240163192287;
@@ -54,30 +48,11 @@ export function MapPlane(props) {
 
   // Convert borehole data to the format required by BoreholeCylinder
   const boreholeSegments = boreholeData.map((d) => ({
-    from: d.From_Depth,
-    to: d.To_Depth,
+    from: d.From_Depth_mbgs,
+    to: d.To_Depth_mbgs,
     color: d.Colour,
   }));
 
-  /*return (
-    <>
-      <mesh {...props} rotation={[-Math.PI / 2, 0, Math.PI]}>
-        <planeGeometry args={[1, 1]} />
-        <meshStandardMaterial 
-          ref={materialRef}  // Use the loaded texture if available
-          color='white'  // Set color to white to allow the texture to show through
-          side={THREE.DoubleSide} 
-        />
-      </mesh>
-      <mesh {...props} position={[0, -.5001, 0]}>
-        <cylinderGeometry args={[.05, .05]}/>
-        <meshStandardMaterial 
-          color='red'  // Set color to white to allow the texture to show through
-          side={THREE.DoubleSide} 
-        />
-      </mesh>
-    </>
-  );*/
   return (
     <>
       <mesh {...props} rotation={[-Math.PI / 2, 0, Math.PI]}>
@@ -88,7 +63,7 @@ export function MapPlane(props) {
           side={THREE.DoubleSide}
         />
       </mesh>
-      <mesh {...props} position={[0, -0.5001, 0]}>
+      <mesh {...props} position={[0, 0, 0]}>
         <BoreholeCylinder segments={boreholeSegments} totalDepth={25.3} />
       </mesh>
     </>
