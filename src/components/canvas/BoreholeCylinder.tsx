@@ -1,6 +1,7 @@
 import * as THREE from 'three';
 import { Mesh, CylinderGeometry, MeshStandardMaterial } from 'three';
 import { useRef, useEffect } from 'react';
+import { useThree, extend } from '@react-three/fiber';
 
 interface BoreholeSegment {
   from: number;
@@ -16,28 +17,16 @@ interface BoreholeCylinderProps {
 export const BoreholeCylinder = ({ segments, totalDepth }: BoreholeCylinderProps) => {
   const cylinderGroupRef = useRef(new THREE.Group());
   const raycasterRef = useRef(new THREE.Raycaster());
-  const mouseRef = useRef(new THREE.Vector2());
-
-  const handleMouseMove = (event: MouseEvent) => {
-    // Update mouse coordinates
-    mouseRef.current.x = (event.clientX / window.innerWidth) * 2 - 1;
-    mouseRef.current.y = -(event.clientY / window.innerHeight) * 2 + 1;
-  };
-
-  useEffect(() => {
-    window.addEventListener('mousemove', handleMouseMove);
-
-    return () => {
-      window.removeEventListener('mousemove', handleMouseMove);
-    };
-  }, []);
+  const { camera, mouse, scene } = useThree(); // Get camera, mouse, and scene from useThree
 
   useEffect(() => {
     // Perform raycasting to detect hover
     const checkForHover = () => {
       if (!cylinderGroupRef.current) return;
 
-      raycasterRef.current.setFromCamera(mouseRef.current, new THREE.PerspectiveCamera());
+      // Use camera from the useThree hook
+      raycasterRef.current.setFromCamera(mouse, camera);
+
       const intersects = raycasterRef.current.intersectObjects(cylinderGroupRef.current.children);
 
       if (intersects.length > 0) {
@@ -55,7 +44,7 @@ export const BoreholeCylinder = ({ segments, totalDepth }: BoreholeCylinderProps
     };
 
     animate();
-  }, []);
+  }, [camera, mouse]); // Depend on camera and mouse
 
   // Calculate the total height of the cylinder based on the borehole depth
   const heightScale = 1 / totalDepth;
