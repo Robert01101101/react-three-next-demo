@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { Suspense, useState } from 'react';
+import { Suspense, useState, useEffect } from 'react';
 
 // Dynamically import necessary components
 const MapPlaneAndBoreholes = dynamic(() => import('@/components/canvas/MapPlaneAndBoreholes').then(mod => mod.MapPlaneAndBoreholes), { ssr: false });
@@ -11,6 +11,8 @@ const Common = dynamic(() => import('@/components/canvas/View').then(mod => mod.
 export default function MapWithControls() {
   const [opacity, setOpacity] = useState(1); // State to control map opacity
   const [isMovementDetected, setIsMovementDetected] = useState(false); // State to track movement detection
+  const [resetTriggered, setResetTriggered] = useState(false); // State to track if reset button was pressed
+
 
   const handleMovementDetected = () => {
     //console.log('movementDetectedInParent');
@@ -20,13 +22,25 @@ export default function MapWithControls() {
   const handleReset = () => {
     setIsMovementDetected(false); // Reset movement detection state
     console.log('handleReset Parent');
-    // Add any other reset logic you need here
+    setResetTriggered(true); // Trigger reset event
   };
+
+  // Reset `resetTriggered` state after it has been passed to View
+  useEffect(() => {
+    if (resetTriggered) {
+      setResetTriggered(false); // Reset after triggering the event
+    }
+  }, [resetTriggered]);
 
   return (
     <div className="w-100 relative h-screen">
       {/* Three.js View */}
-      <View orbit onMovementDetected={handleMovementDetected} onReset={handleReset} className="size-full">
+       <View
+        orbit
+        onMovementDetected={handleMovementDetected}
+        onReset={resetTriggered ? handleReset : undefined} // Pass onReset only when resetTriggered is true
+        className="size-full"
+      >
         <Suspense fallback={null}>
           <MapPlaneAndBoreholes opacity={opacity} />
           <Common />
@@ -57,10 +71,16 @@ export default function MapWithControls() {
       {isMovementDetected && (
         <button
           onClick={handleReset}
-          className="absolute right-4 top-4 z-20 rounded-md bg-red-600 p-2 text-white shadow"
+          className="absolute right-4 top-4 z-20 rounded-full bg-gray-700 p-3 text-white opacity-90 shadow hover:bg-gray-500"
         >
-          Reset
+          <svg width="2rem" height="2rem" viewBox="0 0 21 21" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" fill-rule="evenodd" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" transform="matrix(0 1 1 0 2.5 2.5)">
+            <path d="m3.98652376 1.07807068c-2.38377179 1.38514556-3.98652376 3.96636605-3.98652376 6.92192932 0 4.418278 3.581722 8 8 8s8-3.581722 8-8-3.581722-8-8-8"/>
+            <path d="m4 1v4h-4" transform="matrix(1 0 0 -1 0 6)"/>
+            </g>
+          </svg>
         </button>
+
       )}
     </div>
   );

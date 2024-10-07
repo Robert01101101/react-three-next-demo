@@ -39,9 +39,9 @@ const View = forwardRef(({ children, orbit, onMovementDetected, onReset, ...prop
         }
 
         if (
-          Math.abs(azimuthalAngle - initialValuesRef.current.azimuthal) > 0.001 ||
-          Math.abs(polarAngle - initialValuesRef.current.polar) > 0.001 ||
-          Math.abs(distance - initialValuesRef.current.distance) > 0.001
+          Math.abs(azimuthalAngle - initialValuesRef.current.azimuthal) > 0.01 ||
+          Math.abs(polarAngle - initialValuesRef.current.polar) > 0.01 ||
+          Math.abs(distance - initialValuesRef.current.distance) > 0.01
         ) {
           //console.log('movement');
           if (onMovementDetected) {
@@ -62,7 +62,11 @@ const View = forwardRef(({ children, orbit, onMovementDetected, onReset, ...prop
     if (onReset) {
       console.log('Reset action triggered child View'); // Log when onReset is called
       if (controlsRef.current) {
-        controlsRef.current.reset(); // Reset the OrbitControls
+        //TODO: Figure out correct way to do this
+        controlsRef.current.enableDamping = false;
+        controlsRef.current.reset();
+        controlsRef.current.enableDamping = true;
+        controlsRef.current.reset();
       }
     }
   }, [onReset]); // Run whenever onReset changes (e.g., when the reset button is clicked)
