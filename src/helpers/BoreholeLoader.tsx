@@ -31,31 +31,23 @@ export const useBoreholeData = (csvUrl: string) => {
   const [boreholeData, setBoreholeData] = useState<BoreholeInterval[]>([]);
 
   useEffect(() => {
-  d3.csv(csvUrl, d => {
-    if (d['Borehole_Name'] === '1') {
-      return {
+    d3.csv(csvUrl).then(data => {
+      const filteredData = data.map(d => ({
         Borehole_Name: d['Borehole_Name'] as string,
         From_Depth_mbgs: +d['From_Depth_mbgs'],
         To_Depth_mbgs: +d['To_Depth_mbgs'],
         Pri_Material: d['Pri_Material'] as string,
-        Sec_Material: d['Sec_Material'] as string || '',  // Handle missing data
+        Sec_Material: d['Sec_Material'] as string || '',
         Colour: mapColor(d['Colour'] as string),
         Colour_Label: d['Colour'] as string,
-        Full_Text: d['Full_Text'] as string || '',        // Handle missing data
-        Comment: d['Comment'] as string || '',            // Handle missing data
-      };
-    }
-    return null; // Return null for rows you want to skip
-  })
-  .then(data => {
-    const filteredData = data.filter(d => d !== null) as BoreholeInterval[];
-    setBoreholeData(filteredData);
-  })
-  .catch(error => {
-    console.error("Error loading CSV data:", error);
-  });
+        Full_Text: d['Full_Text'] as string || '',
+        Comment: d['Comment'] as string || '',
+      }));
+      setBoreholeData(filteredData);
+    }).catch(error => {
+      console.error("Error loading CSV data:", error);
+    });
   }, [csvUrl]);
-
 
   return boreholeData;
 };
