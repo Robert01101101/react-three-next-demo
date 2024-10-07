@@ -13,19 +13,20 @@ export default function MapWithControls() {
   const [isMovementDetected, setIsMovementDetected] = useState(false); // State to track movement detection
 
   const handleMovementDetected = () => {
-    console.log('movementDetectedInParent');
+    //console.log('movementDetectedInParent');
     setIsMovementDetected(true); // Set state to true when movement is detected
   };
 
   const handleReset = () => {
     setIsMovementDetected(false); // Reset movement detection state
+    console.log('handleReset Parent');
     // Add any other reset logic you need here
   };
 
   return (
     <div className="w-100 relative h-screen">
       {/* Three.js View */}
-      <View orbit onMovementDetected={handleMovementDetected} className="size-full">
+      <View orbit onMovementDetected={handleMovementDetected} onReset={handleReset} className="size-full">
         <Suspense fallback={null}>
           <MapPlaneAndBoreholes opacity={opacity} />
           <Common />

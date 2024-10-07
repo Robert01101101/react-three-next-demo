@@ -14,7 +14,7 @@ export const Common = ({ color }) => (
   </Suspense>
 )
 
-const View = forwardRef(({ children, orbit, onMovementDetected, ...props }, ref) => {
+const View = forwardRef(({ children, orbit, onMovementDetected, onReset, ...props }, ref) => {
   const localRef = useRef(null)
   const controlsRef = useRef(null); // Ref to store the OrbitControls instance
   const initialValuesRef = useRef({ azimuthal: null, polar: null, distance: null }); // Use ref for initial values
@@ -43,7 +43,7 @@ const View = forwardRef(({ children, orbit, onMovementDetected, ...props }, ref)
           Math.abs(polarAngle - initialValuesRef.current.polar) > 0.001 ||
           Math.abs(distance - initialValuesRef.current.distance) > 0.001
         ) {
-          console.log('movement');
+          //console.log('movement');
           if (onMovementDetected) {
             onMovementDetected(); // Call the parent's movement detection handler
           }
@@ -55,6 +55,18 @@ const View = forwardRef(({ children, orbit, onMovementDetected, ...props }, ref)
 
     return () => clearInterval(intervalId); // Cleanup on unmount
   }, [onMovementDetected]); // Add onMovementDetected to the dependency array
+
+
+  // Log when the reset action occurs
+  useEffect(() => {
+    if (onReset) {
+      console.log('Reset action triggered child View'); // Log when onReset is called
+      if (controlsRef.current) {
+        controlsRef.current.reset(); // Reset the OrbitControls
+      }
+    }
+  }, [onReset]); // Run whenever onReset changes (e.g., when the reset button is clicked)
+
 
   return (
     <>
