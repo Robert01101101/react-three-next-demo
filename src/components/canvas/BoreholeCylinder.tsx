@@ -38,11 +38,23 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
               </tr>
               <tr>
                 <td>Material</td>
-                <td>${segmentData.lithology}</td>
+                <td>${segmentData.pri_material}</td>
+              </tr>
+              <tr>
+                <td>Secondary Material</td>
+                <td>${segmentData.sec_material}</td>
               </tr>
               <tr>
                 <td>Color</td>
                 <td>${segmentData.color_label}</td>
+              </tr>
+              <tr>
+                <td>Full_Text</td>
+                <td>${segmentData.full_text}</td>
+              </tr>
+              <tr>
+                <td>Comment</td>
+                <td>${segmentData.comment}</td>
               </tr>
             </table>`;
           tooltip.style.display = 'block';

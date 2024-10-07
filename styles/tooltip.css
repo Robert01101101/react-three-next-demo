@@ -20,7 +20,16 @@
 
 #tooltip th, #tooltip td {
   padding: 5px;
-  text-align: left
+  text-align: left;
+  vertical-align: top;
+}
+
+#tooltip th:nth-child(2), #tooltip td:nth-child(2) {
+  max-width: 200px; /* Set your desired maximum width */
+  overflow-wrap: break-word; /* Allows text to wrap */
+  word-wrap: break-word; /* Fallback for older browsers */
+  overflow: hidden; /* Optional: hides overflow text */
+  white-space: normal; /* Allows wrapping */
 }
 
 #tooltip th {

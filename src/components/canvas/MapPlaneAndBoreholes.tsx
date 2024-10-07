@@ -19,7 +19,10 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
     to: d.To_Depth_mbgs,
     color: d.Colour,
     color_label: d.Colour_Label,
-    lithology: d.Pri_Material,
+    pri_material: d.Pri_Material,
+    sec_material: d.Sec_Material,
+    full_text: d.Full_Text,
+    comment: d.Comment,
   }));
 
   return (
