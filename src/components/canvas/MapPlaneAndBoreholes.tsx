@@ -51,6 +51,8 @@ export function MapPlaneAndBoreholes(props) {
     from: d.From_Depth_mbgs,
     to: d.To_Depth_mbgs,
     color: d.Colour,
+    color_label: d.Colour_Label,
+    lithology: d.Pri_Material,
   }));
 
   return (

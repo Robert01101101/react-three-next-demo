@@ -26,7 +26,25 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
 
         if (segmentData) {
           // Show tooltip with segment information
-          tooltip.innerHTML = `Depth: ${segmentData.from}m to ${segmentData.to}m<br/>Color: ${segmentData.color}`;
+          tooltip.innerHTML = `
+            <table>
+              <tr>
+                <td>From Depth (mbgs)</td>
+                <td>${segmentData.from} m</td>
+              </tr>
+              <tr>
+                <td>To Depth (mbgs)</td>
+                <td>${segmentData.to} m</td>
+              </tr>
+              <tr>
+                <td>Material</td>
+                <td>${segmentData.lithology}</td>
+              </tr>
+              <tr>
+                <td>Color</td>
+                <td>${segmentData.color_label}</td>
+              </tr>
+            </table>`;
           tooltip.style.display = 'block';
         }
       } else {

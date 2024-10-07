@@ -8,6 +8,7 @@ interface BoreholeInterval {
   To_Depth_mbgs: number;
   Pri_Material: string;
   Colour: string;
+  Colour_Label: string;
 }
 
 const colorMap: { [key: string]: string } = {
@@ -37,6 +38,7 @@ export const useBoreholeData = (csvUrl: string) => {
           To_Depth_mbgs: +d['To_Depth_mbgs'],
           Pri_Material: d['Pri_Material'] as string,
           Colour: mapColor(d['Colour'] as string),
+          Colour_Label: d['Colour'] as string,
         };
       }
       return null; // Return null for rows you want to skip

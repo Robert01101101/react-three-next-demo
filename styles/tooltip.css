@@ -10,3 +10,22 @@
   white-space: nowrap;
   transform: translate(10px, -50%);
 }
+
+#tooltip table {
+  border-collapse: collapse;
+  width: 100%; 
+}
+
+#tooltip th, #tooltip td {
+  padding: 5px;
+  text-align: left
+}
+
+#tooltip th {
+  background-color: #f2f2f2;
+  border-bottom: 1px solid #cccccc;
+}
+
+#tooltip tr:not(:last-child) td {
+  border-bottom: 1px solid rgba(255, 255, 255, .3);
+}
