@@ -1,0 +1,31 @@
+/* legend.css */
+
+.legend {
+  position: absolute; /* Use absolute positioning */
+  top: 10px; /* Adjust based on where you want it on the page */
+  left: 10px; /* Adjust based on where you want it on the page */
+  background-color: rgba(255, 255, 255, 0.9);
+  border: 1px solid #cccccc;
+  border-radius: 5px;
+  padding: 1.5rem;
+  z-index: 1000; /* Make sure it's on top of other elements */
+  max-width: 20rem; /* Limit the width if needed */
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.1); /* Optional shadow for better visibility */
+}
+
+.legend-item {
+  display: flex; /* Use flexbox for alignment */
+  align-items: center; /* Center vertically */
+  margin-top: .5rem; /* Space between legend items */
+}
+
+.color-box {
+  width: 20px; /* Size of the color box */
+  height: 20px; /* Size of the color box */
+  border-radius: 4px; /* Change to 50% for circles */
+  margin-right: 10px; /* Space between color box and label */
+}
+
+h3 {
+  font-weight: bold;
+}

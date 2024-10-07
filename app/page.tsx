@@ -11,6 +11,7 @@ const Duck = dynamic(() => import('@/components/canvas/Examples').then((mod) => 
 //new from me
 const MapPlaneAndBoreholes = dynamic(() => import('@/components/canvas/MapPlaneAndBoreholes').then((mod) => mod.MapPlaneAndBoreholes), { ssr: false })
 const MapImage = dynamic(() => import('@/components/canvas/DemoImage').then((mod) => mod.MapImage), { ssr: false })
+import Legend from '@/components/Legend';
 
 const View = dynamic(() => import('@/components/canvas/View').then((mod) => mod.View), {
   ssr: false,
@@ -43,6 +44,8 @@ export default function Page() {
 
         {/* Tooltip for displaying depth, color, etc */}
         <div id="tooltip" className="pointer-events-none absolute hidden rounded bg-gray-700 px-2 py-1 text-white opacity-90" />
+
+        <Legend />
       </div>
 
       <div className='mx-auto flex w-full flex-col flex-wrap items-center md:flex-row  lg:w-4/5'>
