@@ -10,14 +10,13 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
   const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
   let currentOutline = null; // Variable to store the current outline
 
-  useEffect(() => {
+   useEffect(() => {
     const tooltip = document.getElementById('tooltip');
     
     const checkForHover = () => {
       if (!cylinderGroupRef.current || !tooltip) return;
 
       raycasterRef.current.setFromCamera(mouse, camera);
-
       const intersects = raycasterRef.current.intersectObjects(cylinderGroupRef.current.children);
 
       if (intersects.length > 0) {
@@ -25,6 +24,7 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
         const segmentData = intersectedObject.userData.segmentData;
 
         if (segmentData) {
+          console.log('Borehole contains ' + segments.length + ' segments. checkForHover, mouse:', mouse, 'camera:', camera, 'cylinderGroupRef:', cylinderGroupRef, 'tooltip:', tooltip);
           // Show tooltip with segment information
           tooltip.innerHTML = `
             <table>
@@ -59,8 +59,6 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
             </table>`;
           tooltip.style.display = 'block';
         }
-      } else {
-        tooltip.style.display = 'none';
       }
     };
 
@@ -88,8 +86,12 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
         const edges = new THREE.EdgesGeometry(selectedSegment.geometry);
         currentOutline = new THREE.LineSegments(edges, outlineMaterial);
         
-        // Set the position to match the original segment
-        currentOutline.position.copy(selectedSegment.position);
+        // Get world position of the selected segment
+        const worldPosition = new THREE.Vector3();
+        selectedSegment.getWorldPosition(worldPosition);
+        
+        // Set the outline position to the world position
+        currentOutline.position.copy(worldPosition);
         
         // Add the outline to the scene
         scene.add(currentOutline);
