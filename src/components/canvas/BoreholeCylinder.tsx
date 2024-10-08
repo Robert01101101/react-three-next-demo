@@ -80,7 +80,7 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered, boreholeData
         const intersectedObject = intersects[0].object;
 
         // Check if the sphere is hovered
-        if (intersectedObject.geometry instanceof THREE.SphereGeometry) {
+         if (intersectedObject instanceof THREE.Mesh && intersectedObject.geometry instanceof THREE.SphereGeometry) {
           console.log('Borehole Data:', intersectedObject.userData.boreholeData);
           const segmentData = intersectedObject.userData.boreholeData;
           if (segmentData) {

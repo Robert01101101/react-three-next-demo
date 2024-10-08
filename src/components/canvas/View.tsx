@@ -14,7 +14,15 @@ export const Common = ({ color }) => (
   </Suspense>
 )
 
-const View = forwardRef(({ children, orbit, onMovementDetected, onReset, ...props }, ref) => {
+interface ViewProps {
+  children?: React.ReactNode; // Add children prop
+  orbit?: boolean;
+  onMovementDetected?: () => void;
+  onReset?: () => void;
+  [key: string]: any; // Allows additional props
+}
+
+const View = forwardRef<HTMLDivElement, ViewProps>(({ children, orbit, onMovementDetected, onReset, ...props }, ref) => {
   const localRef = useRef(null)
   const controlsRef = useRef(null); // Ref to store the OrbitControls instance
   const initialValuesRef = useRef({ azimuthal: null, polar: null, distance: null }); // Use ref for initial values
