@@ -131,48 +131,52 @@ export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string)
   useEffect(() => {
     const loadSegmentData = async (csvUrl: string) => {
       const data = await d3.csv(csvUrl);
-      return data.map(d => ({
-        Borehole_Name: d['Borehole_Name'] as string,
-        From_Depth_mbgs: +d['From_Depth_mbgs'],
-        To_Depth_mbgs: +d['To_Depth_mbgs'],
-        Pri_Material: d['Pri_Material'] as string,
-        Sec_Material: d['Sec_Material'] as string || '',
-        Colour: mapColor(d['Colour'] as string),
-        Colour_Label: d['Colour'] as string,
-        Full_Text: d['Full_Text'] as string || '',
-        Comment: d['Comment'] as string || '',
-      }));
+      return data
+        .filter(d => parseInt(d['Borehole_Name']) <= 50) // Filter borehole names 50 or below
+        .map(d => ({
+          Borehole_Name: d['Borehole_Name'] as string,
+          From_Depth_mbgs: +d['From_Depth_mbgs'],
+          To_Depth_mbgs: +d['To_Depth_mbgs'],
+          Pri_Material: d['Pri_Material'] as string,
+          Sec_Material: d['Sec_Material'] as string || '',
+          Colour: mapColor(d['Colour'] as string),
+          Colour_Label: d['Colour'] as string,
+          Full_Text: d['Full_Text'] as string || '',
+          Comment: d['Comment'] as string || '',
+        }));
     };
 
     const loadBoreholeData = async (csvUrl: string) => {
       const data = await d3.csv(csvUrl);
-      return data.map(d => ({
-        Name: d['Name'] as string,
-        Source_ID: d['Source_ID'] as string,
-        Alias1: d['Alias1'] || '',
-        Date_Drilled: d['Date_Drilled'] || '',
-        Depth_Reference: d['Depth_Reference'] || '',
-        El_DR_masl: d['El_DR_masl'] ? +d['El_DR_masl'] : undefined,
-        Elev_Method: d['Elev_Method'] || '',
-        Total_Depth_m: d['Total_Depth_m'] ? +d['Total_Depth_m'] : undefined,
-        E_10TM83: d['E_10TM83'] ? +d['E_10TM83'] : undefined,
-        N_10TM83: d['N_10TM83'] ? +d['N_10TM83'] : undefined,
-        Lat_NAD83: d['Lat_NAD83'] ? +d['Lat_NAD83'] : undefined,
-        Long_NAD83: d['Long_NAD83'] ? +d['Long_NAD83'] : undefined,
-        Source_CRS: d['Source_CRS'] || '',
-        Drilling_Company: d['Drilling_Company'] || '',
-        Drilling_Method: d['Drilling_Method'] || '',
-        Driller: d['Driller'] || '',
-        Logger: d['Logger'] || '',
-        Owner: d['Owner'] || '',
-        Well_Presence: d['Well_Presence'] || '',
-        Spatial_Precision: d['Spatial_Precision'] ? +d['Spatial_Precision'] : undefined,
-        Georef: d['Georef'] || '',
-        Folder: d['Folder'] || '',
-        LogPDF: d['LogPDF'] || '',
-        Purpose: d['Purpose'] || '',
-        Comment: d['Comment'] || '',
-      }));
+      return data
+        .filter(d => parseInt(d['Name']) <= 50) // Filter borehole names 50 or below
+        .map(d => ({
+          Name: d['Name'] as string,
+          Source_ID: d['Source_ID'] as string,
+          Alias1: d['Alias1'] || '',
+          Date_Drilled: d['Date_Drilled'] || '',
+          Depth_Reference: d['Depth_Reference'] || '',
+          El_DR_masl: d['El_DR_masl'] ? +d['El_DR_masl'] : undefined,
+          Elev_Method: d['Elev_Method'] || '',
+          Total_Depth_m: d['Total_Depth_m'] ? +d['Total_Depth_m'] : undefined,
+          E_10TM83: d['E_10TM83'] ? +d['E_10TM83'] : undefined,
+          N_10TM83: d['N_10TM83'] ? +d['N_10TM83'] : undefined,
+          Lat_NAD83: d['Lat_NAD83'] ? +d['Lat_NAD83'] : undefined,
+          Long_NAD83: d['Long_NAD83'] ? +d['Long_NAD83'] : undefined,
+          Source_CRS: d['Source_CRS'] || '',
+          Drilling_Company: d['Drilling_Company'] || '',
+          Drilling_Method: d['Drilling_Method'] || '',
+          Driller: d['Driller'] || '',
+          Logger: d['Logger'] || '',
+          Owner: d['Owner'] || '',
+          Well_Presence: d['Well_Presence'] || '',
+          Spatial_Precision: d['Spatial_Precision'] ? +d['Spatial_Precision'] : undefined,
+          Georef: d['Georef'] || '',
+          Folder: d['Folder'] || '',
+          LogPDF: d['LogPDF'] || '',
+          Purpose: d['Purpose'] || '',
+          Comment: d['Comment'] || '',
+        }));
     };
 
     const loadData = async () => {
