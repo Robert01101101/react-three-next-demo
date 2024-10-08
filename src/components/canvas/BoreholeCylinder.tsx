@@ -1,6 +1,6 @@
 import * as THREE from 'three';
 import { Mesh, CylinderGeometry, MeshStandardMaterial } from 'three';
-import { useRef, useEffect } from 'react';
+import { useRef, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 
 export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
@@ -10,9 +10,54 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
   const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
   let currentOutline = null; // Variable to store the current outline
 
+  // Memoize the creation of the cylinders to prevent re-creation on each render
+  const cylinderGroup = useMemo(() => {
+    const group = new THREE.Group();
+
+    const heightScale = 1 / totalDepth;
+
+    segments.forEach((segment) => {
+      const segmentHeight = (segment.to - segment.from) * heightScale;
+
+      // Create high-resolution geometry
+      const highResGeometry = new CylinderGeometry(0.025, 0.025, segmentHeight, 16);
+      const highResMaterial = new MeshStandardMaterial({ color: segment.color });
+      const highResMesh = new Mesh(highResGeometry, highResMaterial);
+      highResMesh.position.y = -segment.from * heightScale - segmentHeight / 2;
+      highResMesh.userData = { segmentData: segment };
+
+      // Create low-resolution geometry
+      const lowResGeometry = new CylinderGeometry(0.025, 0.025, segmentHeight, 4);
+      const lowResMaterial = new MeshStandardMaterial({ color: segment.color });
+      const lowResMesh = new Mesh(lowResGeometry, lowResMaterial);
+      lowResMesh.position.y = -segment.from * heightScale - segmentHeight / 2;
+      lowResMesh.userData = { segmentData: segment };
+
+      console.log('adding segment', segment);
+
+      // Create a LOD object for this segment
+      const lod = new THREE.LOD();
+      lod.addLevel(highResMesh, 1.5); // Show high resolution when close
+      lod.addLevel(lowResMesh, 3); // Show low resolution when further away
+
+      // Add the LOD object to the group
+      group.add(lod);
+    });
+
+    return group;
+  }, [segments, totalDepth]); // Only recompute if segments or totalDepth changes
+
+  // Add the memoized group to the scene
+  useEffect(() => {
+    cylinderGroupRef.current.add(cylinderGroup);
+    return () => {
+      cylinderGroupRef.current.remove(cylinderGroup); // Clean up the group when unmounting
+    };
+  }, [cylinderGroup]);
+
   useEffect(() => {
     const tooltip = document.getElementById('tooltip');
-    
+
     const checkForHover = () => {
       if (!cylinderGroupRef.current || !tooltip) return;
 
@@ -76,6 +121,9 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
     };
 
     const onMouseClick = () => {
+      return;
+      //Disabled for now
+      /*
       // Update raycaster to find clicked objects
       raycasterRef.current.setFromCamera(mouse, camera);
       const intersects = raycasterRef.current.intersectObjects(cylinderGroupRef.current.children);
@@ -107,7 +155,7 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
           scene.remove(currentOutline);
           currentOutline = null; // Reset current outline
         }
-      }
+      }*/
     };
 
     window.addEventListener('mousemove', onMouseMove);
@@ -125,21 +173,6 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
       window.removeEventListener('click', onMouseClick); // Clean up click event listener
     };
   }, [camera, mouse, isHovered]); // Add isHovered to dependencies
-
-  // Calculate the total height of the cylinder based on the borehole depth
-  const heightScale = 1 / totalDepth;
-
-  segments.forEach((segment) => {
-    const segmentHeight = (segment.to - segment.from) * heightScale;
-    const geometry = new CylinderGeometry(0.025, 0.025, segmentHeight, 32);
-    const material = new MeshStandardMaterial({ color: segment.color });
-
-    const segmentMesh = new Mesh(geometry, material);
-    segmentMesh.position.y = -segment.from * heightScale - segmentHeight / 2;
-    segmentMesh.userData = { segmentData: segment };
-
-    cylinderGroupRef.current.add(segmentMesh);
-  });
 
   return <primitive object={cylinderGroupRef.current} />;
 };
