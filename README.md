@@ -8,7 +8,15 @@ The goal of this app is to
 
 ## Progress
 
-![Screenshot](docs/screenshots/v0.png)
+### Day 2
+
+![Screenshot Day 2](docs/screenshots/v1.png)
+
+After being able to load a single borehole and display it with a tooltip, today my goal was to load multiple boreholes, display borehole metadata, and position them on the map. I was able to implement all of this except for the map positioning, as I ran out of time. The scope of this project is probably beyond what makes sense to fully learn the structure of React.js, Next.js, and r3f. However, thanks to ChatGPT, I was able to dive in quickly and learn by doing, and it has helped me to identify areas to focus on in terms of learning. Particularly managing state, context api, and JS data structures. It was also helpful to ask AI to compare React to Flutter, so I have an idea of how concepts translate (for example, props in React are like Widget properties in Flutter).
+
+### Day 1
+
+![Screenshot Day 1](docs/screenshots/v0.png)
 
 It's been challenging learning so many things at once and putting it all together. But I'm happy with the progress so far, after two days I have my app with the ability to load map textures for a given region, display them on a plane, set plane opacity with a slider, load sample borehole lithology data from a .csv file, and display it along with an interactive tooltip on hover.
 
