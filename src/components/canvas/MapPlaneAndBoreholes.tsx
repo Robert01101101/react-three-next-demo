@@ -13,7 +13,14 @@ interface MapPlaneAndBoreholesProps {
 
 export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
   // Load borehole and segment data
-  const { segmentData, boreholeData } = useBoreholeData(segmentsCsvUrl, boreholeCsvUrl);
+  const { segmentData, boreholeData, minLat, maxLat, minLong, maxLong } = useBoreholeData(segmentsCsvUrl, boreholeCsvUrl);
+
+  console.log('Segment Data:', segmentData);
+  console.log('Borehole Data:', boreholeData);
+  console.log('Min Lat:', minLat);
+  console.log('Max Lat:', maxLat);
+  console.log('Min Long:', minLong);
+  console.log('Max Long:', maxLong);
 
   // Group segments by Borehole_Name
   const boreholeSegments = segmentData.reduce((acc, d) => {
@@ -47,7 +54,7 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
 
   return (
     <>
-      <MapSurface opacity={opacity} />
+      <MapSurface opacity={opacity} minLat={minLat} minLon={minLong} maxLat={maxLat} maxLon={maxLong} />
       {Object.entries(boreholeSegments).map(([boreholeName, segments], index) => {
         console.log('Borehole Name:', boreholeName);
 

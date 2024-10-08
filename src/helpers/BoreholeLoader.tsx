@@ -127,6 +127,10 @@ const mapColor = (color: string): string => {
 export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string) => {
   const [segmentData, setSegmentData] = useState<BoreholeInterval[]>([]);
   const [boreholeData, setBoreholeData] = useState<BoreholeData[]>([]);
+  const [minLat, setMinLat] = useState<number | undefined>(undefined);
+  const [maxLat, setMaxLat] = useState<number | undefined>(undefined);
+  const [minLong, setMinLong] = useState<number | undefined>(undefined);
+  const [maxLong, setMaxLong] = useState<number | undefined>(undefined);
 
   useEffect(() => {
     const loadSegmentData = async (csvUrl: string) => {
@@ -179,6 +183,18 @@ export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string)
         }));
     };
 
+    const calculateMinMax = (boreholeData: BoreholeData[]) => {
+      const minLat_10TM83 = d3.min(boreholeData, d => d.Lat_NAD83 ?? Infinity);
+      const maxLat_10TM83 = d3.max(boreholeData, d => d.Lat_NAD83 ?? -Infinity);
+      const minLong_10TM83 = d3.min(boreholeData, d => d.Long_NAD83 ?? Infinity);
+      const maxLong_10TM83 = d3.max(boreholeData, d => d.Long_NAD83 ?? -Infinity);
+
+      setMinLat(minLat_10TM83);
+      setMaxLat(maxLat_10TM83);
+      setMinLong(minLong_10TM83);
+      setMaxLong(maxLong_10TM83);
+    };
+
     const loadData = async () => {
       try {
         const segments = await loadSegmentData(segmentsCsvUrl);
@@ -186,6 +202,8 @@ export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string)
 
         const boreholes = await loadBoreholeData(boreholesCsvUrl);
         setBoreholeData(boreholes);
+
+        calculateMinMax(boreholes);
       } catch (error) {
         console.error("Error loading CSV data:", error);
       }
@@ -194,5 +212,5 @@ export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string)
     loadData();
   }, [segmentsCsvUrl, boreholesCsvUrl]);
 
-  return { segmentData, boreholeData };
+  return { segmentData, boreholeData, minLat, maxLat, minLong, maxLong };
 };
