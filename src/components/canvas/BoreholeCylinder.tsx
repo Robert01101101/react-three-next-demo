@@ -10,10 +10,12 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered, boreholeData
   const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
   let currentOutline = null; // Variable to store the current outline
 
-  console.log('Borehole Data:', boreholeData);
+  //console.log('Borehole Data:', boreholeData);
 
   // Memoize the creation of the cylinders and sphere
   const cylinderGroup = useMemo(() => {
+    console.log('cylinderGroup useMemo');
+
     const group = new THREE.Group();
     const heightScale = 1 / totalDepth;
 
@@ -76,12 +78,14 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered, boreholeData
       raycasterRef.current.setFromCamera(mouse, camera);
       const intersects = raycasterRef.current.intersectObjects(cylinderGroupRef.current.children);
 
+      console.log('checkForHover');
+
       if (intersects.length > 0) {
         const intersectedObject = intersects[0].object;
 
         // Check if the sphere is hovered
-         if (intersectedObject instanceof THREE.Mesh && intersectedObject.geometry instanceof THREE.SphereGeometry) {
-          console.log('Borehole Data:', intersectedObject.userData.boreholeData);
+        if (intersectedObject instanceof THREE.Mesh && intersectedObject.geometry instanceof THREE.SphereGeometry) {
+          //console.log('Borehole Data:', intersectedObject.userData.boreholeData);
           const segmentData = intersectedObject.userData.boreholeData;
           if (segmentData) {
             // Only show the tooltip if this specific cylinder is hovered
@@ -192,46 +196,46 @@ export const BoreholeCylinder = ({ segments, totalDepth, isHovered, boreholeData
             tooltip.style.display = 'block';
             }
           } 
+        } else {
+          const segmentData = intersectedObject.userData.segmentData;
+          if (segmentData) {
+            // Only show the tooltip if this specific cylinder is hovered
+            if (isHovered) {
+              tooltip.innerHTML = `
+                <table>
+                  <tr>
+                    <td>From Depth (mbgs)</td>
+                    <td>${segmentData.from} m</td>
+                  </tr>
+                  <tr>
+                    <td>To Depth (mbgs)</td>
+                    <td>${segmentData.to} m</td>
+                  </tr>
+                  <tr>
+                    <td>Material</td>
+                    <td>${segmentData.pri_material}</td>
+                  </tr>
+                  <tr>
+                    <td>Secondary Material</td>
+                    <td>${segmentData.sec_material}</td>
+                  </tr>
+                  <tr>
+                    <td>Color</td>
+                    <td>${segmentData.color_label}</td>
+                  </tr>
+                  <tr>
+                    <td>Full_Text</td>
+                    <td>${segmentData.full_text}</td>
+                  </tr>
+                  <tr>
+                    <td>Comment</td>
+                    <td>${segmentData.comment}</td>
+                  </tr>
+                </table>`;
+              tooltip.style.display = 'block';
+            }
+          } 
         }
-
-        const segmentData = intersectedObject.userData.segmentData;
-        if (segmentData) {
-          // Only show the tooltip if this specific cylinder is hovered
-          if (isHovered) {
-            tooltip.innerHTML = `
-              <table>
-                <tr>
-                  <td>From Depth (mbgs)</td>
-                  <td>${segmentData.from} m</td>
-                </tr>
-                <tr>
-                  <td>To Depth (mbgs)</td>
-                  <td>${segmentData.to} m</td>
-                </tr>
-                <tr>
-                  <td>Material</td>
-                  <td>${segmentData.pri_material}</td>
-                </tr>
-                <tr>
-                  <td>Secondary Material</td>
-                  <td>${segmentData.sec_material}</td>
-                </tr>
-                <tr>
-                  <td>Color</td>
-                  <td>${segmentData.color_label}</td>
-                </tr>
-                <tr>
-                  <td>Full_Text</td>
-                  <td>${segmentData.full_text}</td>
-                </tr>
-                <tr>
-                  <td>Comment</td>
-                  <td>${segmentData.comment}</td>
-                </tr>
-              </table>`;
-            tooltip.style.display = 'block';
-          }
-        } 
       } else {
         // Hide tooltip if no intersection is detected
         if (!isHovered) {

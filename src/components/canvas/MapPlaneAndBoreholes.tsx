@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useCallback } from 'react';
 import { MapSurface } from './MapSurface';
 import { TransparencySlider } from './TransparencySlider';
 import { useBoreholeData } from 'src/helpers/BoreholeLoader';
@@ -36,7 +36,16 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
 
   const [hoveredCylinderIndex, setHoveredCylinderIndex] = useState<number | null>(null); // Track hovered index
 
- return (
+  // Memoized handlers to prevent unnecessary re-renders
+  const handlePointerOver = useCallback((index) => {
+    setHoveredCylinderIndex(index);
+  }, []);
+
+  const handlePointerOut = useCallback(() => {
+    setHoveredCylinderIndex(null);
+  }, []);
+
+  return (
     <>
       <MapSurface opacity={opacity} />
       {Object.entries(boreholeSegments).map(([boreholeName, segments], index) => {
@@ -55,13 +64,13 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
           <mesh
             key={index}
             position={[index * 0.1, 0, 0]}
-            onPointerOver={() => setHoveredCylinderIndex(index)}
-            onPointerOut={() => setHoveredCylinderIndex(null)}
+            onPointerOver={() => handlePointerOver(index)}
+            onPointerOut={handlePointerOut}
           >
             <BoreholeCylinder
               segments={segments}
               totalDepth={25.3}
-              isHovered={hoveredCylinderIndex === index}
+              isHovered={hoveredCylinderIndex === index} // Pass the hover state
               boreholeData={correspondingBorehole} // Pass the corresponding borehole data
             />
           </mesh>
