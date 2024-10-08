@@ -14,6 +14,35 @@ interface BoreholeInterval {
   Comment?: string;       // Add Comment (optional)
 }
 
+interface BoreholeData {
+  Name: string;
+  Source_ID: string;
+  Alias1?: string;
+  Date_Drilled?: string;
+  Depth_Reference?: string;
+  El_DR_masl?: number;
+  Elev_Method?: string;
+  Total_Depth_m?: number;
+  E_10TM83?: number;
+  N_10TM83?: number;
+  Lat_NAD83?: number;
+  Long_NAD83?: number;
+  Source_CRS?: string;
+  Drilling_Company?: string;
+  Drilling_Method?: string;
+  Driller?: string;
+  Logger?: string;
+  Owner?: string;
+  Well_Presence?: string;
+  Spatial_Precision?: number;
+  Georef?: string;
+  Folder?: string;
+  LogPDF?: string;
+  Purpose?: string;
+  Comment?: string;
+}
+
+
 //Mapped the first few myself, then used ChatGPT
 const colorMap: { [key: string]: string } = {
   "grey": "#aaaaaa",
@@ -95,12 +124,14 @@ const mapColor = (color: string): string => {
   return colorMap[color.toLowerCase()] || '#FFFFFF'; // Default to white if color is not mapped
 };
 
-export const useBoreholeData = (csvUrl: string) => {
-  const [boreholeData, setBoreholeData] = useState<BoreholeInterval[]>([]);
+export const useBoreholeData = (segmentsCsvUrl: string, boreholesCsvUrl: string) => {
+  const [segmentData, setSegmentData] = useState<BoreholeInterval[]>([]);
+  const [boreholeData, setBoreholeData] = useState<BoreholeData[]>([]);
 
   useEffect(() => {
-    d3.csv(csvUrl).then(data => {
-      const filteredData = data.map(d => ({
+    const loadSegmentData = async (csvUrl: string) => {
+      const data = await d3.csv(csvUrl);
+      return data.map(d => ({
         Borehole_Name: d['Borehole_Name'] as string,
         From_Depth_mbgs: +d['From_Depth_mbgs'],
         To_Depth_mbgs: +d['To_Depth_mbgs'],
@@ -111,11 +142,53 @@ export const useBoreholeData = (csvUrl: string) => {
         Full_Text: d['Full_Text'] as string || '',
         Comment: d['Comment'] as string || '',
       }));
-      setBoreholeData(filteredData);
-    }).catch(error => {
-      console.error("Error loading CSV data:", error);
-    });
-  }, [csvUrl]);
+    };
 
-  return boreholeData;
+    const loadBoreholeData = async (csvUrl: string) => {
+      const data = await d3.csv(csvUrl);
+      return data.map(d => ({
+        Name: d['Name'] as string,
+        Source_ID: d['Source_ID'] as string,
+        Alias1: d['Alias1'] || '',
+        Date_Drilled: d['Date_Drilled'] || '',
+        Depth_Reference: d['Depth_Reference'] || '',
+        El_DR_masl: d['El_DR_masl'] ? +d['El_DR_masl'] : undefined,
+        Elev_Method: d['Elev_Method'] || '',
+        Total_Depth_m: d['Total_Depth_m'] ? +d['Total_Depth_m'] : undefined,
+        E_10TM83: d['E_10TM83'] ? +d['E_10TM83'] : undefined,
+        N_10TM83: d['N_10TM83'] ? +d['N_10TM83'] : undefined,
+        Lat_NAD83: d['Lat_NAD83'] ? +d['Lat_NAD83'] : undefined,
+        Long_NAD83: d['Long_NAD83'] ? +d['Long_NAD83'] : undefined,
+        Source_CRS: d['Source_CRS'] || '',
+        Drilling_Company: d['Drilling_Company'] || '',
+        Drilling_Method: d['Drilling_Method'] || '',
+        Driller: d['Driller'] || '',
+        Logger: d['Logger'] || '',
+        Owner: d['Owner'] || '',
+        Well_Presence: d['Well_Presence'] || '',
+        Spatial_Precision: d['Spatial_Precision'] ? +d['Spatial_Precision'] : undefined,
+        Georef: d['Georef'] || '',
+        Folder: d['Folder'] || '',
+        LogPDF: d['LogPDF'] || '',
+        Purpose: d['Purpose'] || '',
+        Comment: d['Comment'] || '',
+      }));
+    };
+
+    const loadData = async () => {
+      try {
+        const segments = await loadSegmentData(segmentsCsvUrl);
+        setSegmentData(segments);
+
+        const boreholes = await loadBoreholeData(boreholesCsvUrl);
+        setBoreholeData(boreholes);
+      } catch (error) {
+        console.error("Error loading CSV data:", error);
+      }
+    };
+
+    loadData();
+  }, [segmentsCsvUrl, boreholesCsvUrl]);
+
+  return { segmentData, boreholeData };
 };

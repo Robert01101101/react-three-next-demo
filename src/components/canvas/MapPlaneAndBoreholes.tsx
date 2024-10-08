@@ -1,21 +1,22 @@
 import { useState } from 'react';
 import { MapSurface } from './MapSurface';
-import { Boreholes } from './Boreholes';
 import { TransparencySlider } from './TransparencySlider';
 import { useBoreholeData } from 'src/helpers/BoreholeLoader';
+import { BoreholeCylinder } from './BoreholeCylinder'; // Import BoreholeCylinder directly
 
-const boreholeCsvUrl = '/DIG_2014_0012/Intervals.csv';
+const segmentsCsvUrl = '/DIG_2014_0012/Intervals.csv';
+const boreholeCsvUrl = '/DIG_2014_0012/Boreholes.csv';
 
 interface MapPlaneAndBoreholesProps {
   opacity: number;
 }
 
 export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
-  // Load borehole data
-  const boreholeData = useBoreholeData(boreholeCsvUrl);
+  // Load borehole and segment data
+  const { segmentData, boreholeData } = useBoreholeData(segmentsCsvUrl, boreholeCsvUrl);
 
   // Group segments by Borehole_Name
-  const boreholeSegments = boreholeData.reduce((acc, d) => {
+  const boreholeSegments = segmentData.reduce((acc, d) => {
     const boreholeName = d.Borehole_Name;
     if (!acc[boreholeName]) {
       acc[boreholeName] = [];
@@ -33,10 +34,39 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
     return acc;
   }, {} as Record<string, any[]>);
 
-  return (
+  const [hoveredCylinderIndex, setHoveredCylinderIndex] = useState<number | null>(null); // Track hovered index
+
+ return (
     <>
       <MapSurface opacity={opacity} />
-      <Boreholes boreholeSegments={Object.values(boreholeSegments)} />
+      {Object.entries(boreholeSegments).map(([boreholeName, segments], index) => {
+        console.log('Borehole Name:', boreholeName);
+
+        // Find the corresponding borehole data using the borehole name
+        const correspondingBorehole = boreholeData.find(borehole => 
+          borehole.Name.trim().toLowerCase() === boreholeName.trim().toLowerCase()
+        );
+
+        if (!correspondingBorehole) {
+          console.warn(`No corresponding borehole data found for ${boreholeName}`);
+        }
+
+        return (
+          <mesh
+            key={index}
+            position={[index * 0.1, 0, 0]}
+            onPointerOver={() => setHoveredCylinderIndex(index)}
+            onPointerOut={() => setHoveredCylinderIndex(null)}
+          >
+            <BoreholeCylinder
+              segments={segments}
+              totalDepth={25.3}
+              isHovered={hoveredCylinderIndex === index}
+              boreholeData={correspondingBorehole} // Pass the corresponding borehole data
+            />
+          </mesh>
+        );
+      })}
     </>
   );
 }

@@ -3,12 +3,14 @@ import { Mesh, CylinderGeometry, MeshStandardMaterial } from 'three';
 import { useRef, useEffect, useMemo } from 'react';
 import { useThree } from '@react-three/fiber';
 
-export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
+export const BoreholeCylinder = ({ segments, totalDepth, isHovered, boreholeData }) => {
   const cylinderGroupRef = useRef(new THREE.Group());
   const raycasterRef = useRef(new THREE.Raycaster());
   const { camera, mouse, scene } = useThree();
   const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
   let currentOutline = null; // Variable to store the current outline
+
+  console.log('Borehole Data:', boreholeData);
 
   // Memoize the creation of the cylinders to prevent re-creation on each render
   const cylinderGroup = useMemo(() => {
