@@ -8,9 +8,10 @@ interface MapSurfaceProps {
   minLon: number;
   maxLat: number;
   maxLon: number;
+  onBoundsUpdate: (bounds: { minLat: number; maxLat: number; minLon: number; maxLon: number }) => void;
 }
 
-export function MapSurface({ opacity, minLat, minLon, maxLat, maxLon }: MapSurfaceProps) {
+export function MapSurface({ opacity, minLat, minLon, maxLat, maxLon, onBoundsUpdate }: MapSurfaceProps) {
   const [texture, setTexture] = useState<THREE.Texture | null>(null);
   const materialRef = useRef<THREE.MeshStandardMaterial>(null);
   const [realBounds, setRealBounds] = useState<{ minLat: number, maxLat: number, minLon: number, maxLon: number } | null>(null);
@@ -41,10 +42,11 @@ export function MapSurface({ opacity, minLat, minLon, maxLat, maxLon }: MapSurfa
       // Calculate and set the real bounds of the loaded tile
       const tileBounds = getTileBounds(xTile, yTile, zoomLevel);
       setRealBounds(tileBounds);
+      onBoundsUpdate(tileBounds);
     }, undefined, (error) => {
       console.error('Error loading texture:', error);
     });
-  }, [tileUrl]);
+  }, [tileUrl, onBoundsUpdate, xTile, yTile, zoomLevel]); 
 
   return (
     <mesh rotation={[-Math.PI / 2, 0, Math.PI]}>

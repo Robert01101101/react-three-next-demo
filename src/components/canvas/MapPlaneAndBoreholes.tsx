@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react';
+import { useState, useCallback, useEffect } from 'react';
 import { MapSurface } from './MapSurface';
 import { TransparencySlider } from './TransparencySlider';
 import { useBoreholeData } from 'src/helpers/BoreholeLoader';
@@ -42,6 +42,7 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
   }, {} as Record<string, any[]>);
 
   const [hoveredCylinderIndex, setHoveredCylinderIndex] = useState<number | null>(null); // Track hovered index
+  const [realBounds, setRealBounds] = useState<{ minLat: number; maxLat: number; minLon: number; maxLon: number } | null>(null);
 
   // Memoized handlers to prevent unnecessary re-renders
   const handlePointerOver = useCallback((index) => {
@@ -52,25 +53,45 @@ export function MapPlaneAndBoreholes({ opacity }: MapPlaneAndBoreholesProps) {
     setHoveredCylinderIndex(null);
   }, []);
 
+  // Update the real bounds based on the MapSurface's return
+  const handleBoundsUpdate = (bounds: { minLat: number; maxLat: number; minLon: number; maxLon: number }) => {
+    setRealBounds(bounds);
+  };
+
   return (
     <>
-      <MapSurface opacity={opacity} minLat={minLat} minLon={minLong} maxLat={maxLat} maxLon={maxLong} />
-      {Object.entries(boreholeSegments).map(([boreholeName, segments], index) => {
+      <MapSurface
+        opacity={opacity}
+        minLat={minLat}
+        minLon={minLong}
+        maxLat={maxLat}
+        maxLon={maxLong}
+        onBoundsUpdate={handleBoundsUpdate} // Pass down the callback
+      />
+      {realBounds && Object.entries(boreholeSegments).map(([boreholeName, segments], index) => {
         console.log('Borehole Name:', boreholeName);
 
         // Find the corresponding borehole data using the borehole name
-        const correspondingBorehole = boreholeData.find(borehole => 
+        const correspondingBorehole = boreholeData.find(borehole =>
           borehole.Name.trim().toLowerCase() === boreholeName.trim().toLowerCase()
         );
 
         if (!correspondingBorehole) {
           console.warn(`No corresponding borehole data found for ${boreholeName}`);
+          return null; // Skip rendering if no data is found
         }
+
+        // Calculate normalized position based on real bounds
+        const normalizedPosition: [number, number, number] = [
+          (correspondingBorehole.Long_NAD83 - realBounds.minLon) / (realBounds.maxLon - realBounds.minLon) * 2 - 1.5, // Normalize to -1 to 1
+          0, // Y position can be 0 or adjusted based on depth later
+          (correspondingBorehole.Lat_NAD83 - realBounds.minLat) / (realBounds.maxLat - realBounds.minLat) * 2 - 1 // Normalize to -1 to 1
+        ];
 
         return (
           <mesh
             key={index}
-            position={[index * 0.1, 0, 0]}
+            position={normalizedPosition} // Use the calculated normalized position
             onPointerOver={() => handlePointerOver(index)}
             onPointerOut={handlePointerOut}
           >
