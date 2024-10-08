@@ -3,14 +3,14 @@ import { Mesh, CylinderGeometry, MeshStandardMaterial } from 'three';
 import { useRef, useEffect } from 'react';
 import { useThree } from '@react-three/fiber';
 
-export const BoreholeCylinder = ({ segments, totalDepth }) => {
+export const BoreholeCylinder = ({ segments, totalDepth, isHovered }) => {
   const cylinderGroupRef = useRef(new THREE.Group());
   const raycasterRef = useRef(new THREE.Raycaster());
   const { camera, mouse, scene } = useThree();
   const outlineMaterial = new THREE.LineBasicMaterial({ color: 0xffff00, linewidth: 2 }); // Yellow outline
   let currentOutline = null; // Variable to store the current outline
 
-   useEffect(() => {
+  useEffect(() => {
     const tooltip = document.getElementById('tooltip');
     
     const checkForHover = () => {
@@ -24,40 +24,46 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
         const segmentData = intersectedObject.userData.segmentData;
 
         if (segmentData) {
-          console.log('Borehole contains ' + segments.length + ' segments. checkForHover, mouse:', mouse, 'camera:', camera, 'cylinderGroupRef:', cylinderGroupRef, 'tooltip:', tooltip);
-          // Show tooltip with segment information
-          tooltip.innerHTML = `
-            <table>
-              <tr>
-                <td>From Depth (mbgs)</td>
-                <td>${segmentData.from} m</td>
-              </tr>
-              <tr>
-                <td>To Depth (mbgs)</td>
-                <td>${segmentData.to} m</td>
-              </tr>
-              <tr>
-                <td>Material</td>
-                <td>${segmentData.pri_material}</td>
-              </tr>
-              <tr>
-                <td>Secondary Material</td>
-                <td>${segmentData.sec_material}</td>
-              </tr>
-              <tr>
-                <td>Color</td>
-                <td>${segmentData.color_label}</td>
-              </tr>
-              <tr>
-                <td>Full_Text</td>
-                <td>${segmentData.full_text}</td>
-              </tr>
-              <tr>
-                <td>Comment</td>
-                <td>${segmentData.comment}</td>
-              </tr>
-            </table>`;
-          tooltip.style.display = 'block';
+          // Only show the tooltip if this specific cylinder is hovered
+          if (isHovered) {
+            tooltip.innerHTML = `
+              <table>
+                <tr>
+                  <td>From Depth (mbgs)</td>
+                  <td>${segmentData.from} m</td>
+                </tr>
+                <tr>
+                  <td>To Depth (mbgs)</td>
+                  <td>${segmentData.to} m</td>
+                </tr>
+                <tr>
+                  <td>Material</td>
+                  <td>${segmentData.pri_material}</td>
+                </tr>
+                <tr>
+                  <td>Secondary Material</td>
+                  <td>${segmentData.sec_material}</td>
+                </tr>
+                <tr>
+                  <td>Color</td>
+                  <td>${segmentData.color_label}</td>
+                </tr>
+                <tr>
+                  <td>Full_Text</td>
+                  <td>${segmentData.full_text}</td>
+                </tr>
+                <tr>
+                  <td>Comment</td>
+                  <td>${segmentData.comment}</td>
+                </tr>
+              </table>`;
+            tooltip.style.display = 'block';
+          }
+        } 
+      } else {
+        // Hide tooltip if no intersection is detected
+        if (!isHovered) {
+          tooltip.style.display = 'none';
         }
       }
     };
@@ -118,7 +124,7 @@ export const BoreholeCylinder = ({ segments, totalDepth }) => {
       window.removeEventListener('mousemove', onMouseMove);
       window.removeEventListener('click', onMouseClick); // Clean up click event listener
     };
-  }, [camera, mouse]);
+  }, [camera, mouse, isHovered]); // Add isHovered to dependencies
 
   // Calculate the total height of the cylinder based on the borehole depth
   const heightScale = 1 / totalDepth;
