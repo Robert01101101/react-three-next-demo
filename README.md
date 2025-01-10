@@ -1,5 +1,7 @@
 # react-three-next-demo
 
+[Try Hosted App](https://react-three-next-demo-vrify.vercel.app/)
+
 The goal of this app is to
 
 * Learn and practice TypeScript, React.js, Next.js, React-three-fiber
@@ -7,6 +9,8 @@ The goal of this app is to
 * Provide some interactions, at least some interactive data displays, maybe even networked sessions
 
 ## Progress
+
+The current app works but will crash your browser within minutes because of terrible code. Part of the problem being that every borehole segment performs raycasts for all borehole segments every frame. This was my first time working with React and I have parked this project for now but might return to fix that and learn more abour r3f. In the meantime, you can still play around with this janky demo if you'd like, just don't run it too long, or it will turn your computer into a space heater :)
 
 ### Day 2
 
